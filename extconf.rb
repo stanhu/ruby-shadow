@@ -1,17 +1,21 @@
 #                                          -*- ruby -*-
 # extconf.rb
 #
-# Modified at: <1999/8/19 06:38:55 by ttate> 
+# Modified at: <1999/8/19 06:38:55 by ttate>
 #
 
 require 'mkmf'
 require 'rbconfig'
 
-$CFLAGS = case RUBY_VERSION
-          when /^1\.9/; '-DRUBY19'
-          when /^2\./; '-DRUBY19'
-          else; ''
-          end
+# RUBY19 == not ruby 1.8
+$CFLAGS << " -DRUBY19"
+
+RbConfig::MAKEFILE_CONFIG["CC"] = ENV["CC"] if ENV["CC"]
+
+if RbConfig::MAKEFILE_CONFIG["CC"] =~ /gcc|clang/
+  $CFLAGS << " -O3" unless $CFLAGS[/-O\d/]
+  $CFLAGS << " -Wall"
+end
 
 implementation = case CONFIG['host_os']
                  when /linux/i; 'shadow'
